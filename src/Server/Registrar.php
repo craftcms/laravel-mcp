@@ -168,6 +168,7 @@ class Registrar
             'issuer' => config('mcp.authorization_server') ?? url('/'),
             'authorization_endpoint' => route('passport.authorizations.authorize'),
             'token_endpoint' => route('passport.token'),
+            'jwks_uri' => Router::has('passport.jwks') ? route('passport.jwks') : null,
             'registration_endpoint' => Router::has('mcp.oauth.register') ? route('mcp.oauth.register') : null,
             'response_types_supported' => ['code'],
             'code_challenge_methods_supported' => ['S256'],

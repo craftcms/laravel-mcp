@@ -1206,3 +1206,26 @@ it('advertises a custom registration route when registration is disabled', funct
         ->assertStatus(200)
         ->assertJsonPath('registration_endpoint', url('clients/register'));
 });
+
+it('advertises the Passport key set when its route exists', function (): void {
+    Route::get('/oauth/authorize')->name('passport.authorizations.authorize');
+    Route::post('/oauth/token')->name('passport.token');
+    Route::get('/oauth/jwks')->name('passport.jwks');
+
+    (new Registrar)->oauthRoutes();
+
+    $this->getJson('/.well-known/oauth-authorization-server')
+        ->assertOk()
+        ->assertJsonPath('jwks_uri', url('oauth/jwks'));
+});
+
+it('omits the key set from the metadata when Passport has no key set route', function (): void {
+    Route::get('/oauth/authorize')->name('passport.authorizations.authorize');
+    Route::post('/oauth/token')->name('passport.token');
+
+    (new Registrar)->oauthRoutes();
+
+    $this->getJson('/.well-known/oauth-authorization-server')
+        ->assertOk()
+        ->assertJsonMissingPath('jwks_uri');
+});
